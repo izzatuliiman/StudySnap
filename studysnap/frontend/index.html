@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StudySnap — AI Study Assistant</title>
+  <style>
+    /* ===== CSS VARIABLES / THEMES ===== */
+    :root {
+      --bg-primary: #f0f4ff;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-upload: #eef2ff;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --accent-light: #e0e7ff;
+      --text-primary: #1e1b4b;
+      --text-secondary: #4b5563;
+      --text-muted: #9ca3af;
+      --border: #c7d2fe;
+      --border-light: #e0e7ff;
+      --shadow: 0 4px 24px rgba(99,102,241,0.10);
+      --shadow-hover: 0 8px 32px rgba(99,102,241,0.18);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --success: #10b981;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%);
+      --gradient-soft: linear-gradient(135deg, #eef2ff 0%, #ede9fe 100%);
+      --scrollbar-thumb: #c7d2fe;
+      --scrollbar-track: #f0f4ff;
+    }
+
+    /* DYNAMIC THEMES set by JS */
+    [data-theme="tech"] {
+      --bg-primary: #0f172a; --bg-secondary: #1e293b; --bg-card: #1e293b;
+      --bg-upload: #1e3a5f; --accent: #38bdf8; --accent2: #0ea5e9;
+      --accent-light: #0f2a3d; --text-primary: #e0f2fe; --text-secondary: #94a3b8;
+      --text-muted: #475569; --border: #1e4a6b; --border-light: #1e3a5f;
+      --shadow: 0 4px 24px rgba(56,189,248,0.15); --shadow-hover: 0 8px 32px rgba(56,189,248,0.25);
+      --gradient: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 50%, #7dd3fc 100%);
+      --gradient-soft: linear-gradient(135deg, #0f2a3d 0%, #1e3a5f 100%);
+      --scrollbar-thumb: #1e4a6b; --scrollbar-track: #0f172a;
+    }
+    [data-theme="nature"] {
+      --bg-primary: #f0fdf4; --bg-secondary: #ffffff; --bg-card: #ffffff;
+      --bg-upload: #dcfce7; --accent: #16a34a; --accent2: #15803d;
+      --accent-light: #dcfce7; --text-primary: #14532d; --text-secondary: #4b5563;
+      --text-muted: #9ca3af; --border: #86efac; --border-light: #bbf7d0;
+      --shadow: 0 4px 24px rgba(22,163,74,0.10); --shadow-hover: 0 8px 32px rgba(22,163,74,0.18);
+      --gradient: linear-gradient(135deg, #16a34a 0%, #15803d 50%, #166534 100%);
+      --gradient-soft: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+      --scrollbar-thumb: #86efac; --scrollbar-track: #f0fdf4;
+    }
+    [data-theme="art"] {
+      --bg-primary: #fdf4ff; --bg-secondary: #ffffff; --bg-card: #ffffff;
+      --bg-upload: #fae8ff; --accent: #a21caf; --accent2: #86198f;
+      --accent-light: #fae8ff; --text-primary: #4a044e; --text-secondary: #6b7280;
+      --text-muted: #9ca3af; --border: #e879f9; --border-light: #f5d0fe;
+      --shadow: 0 4px 24px rgba(162,28,175,0.10); --shadow-hover: 0 8px 32px rgba(162,28,175,0.18);
+      --gradient: linear-gradient(135deg, #a21caf 0%, #86198f 50%, #701a75 100%);
+      --gradient-soft: linear-gradient(135deg, #fae8ff 0%, #f5d0fe 100%);
+      --scrollbar-thumb: #e879f9; --scrollbar-track: #fdf4ff;
+    }
+    [data-theme="history"] {
+      --bg-primary: #fefce8; --bg-secondary: #fffbeb; --bg-card: #fffbeb;
+      --bg-upload: #fef9c3; --accent: #b45309; --accent2: #92400e;
+      --accent-light: #fef9c3; --text-primary: #451a03; --text-secondary: #6b7280;
+      --text-muted: #9ca3af; --border: #fcd34d; --border-light: #fef08a;
+      --shadow: 0 4px 24px rgba(180,83,9,0.10); --shadow-hover: 0 8px 32px rgba(180,83,9,0.18);
+      --gradient: linear-gradient(135deg, #b45309 0%, #92400e 50%, #78350f 100%);
+      --gradient-soft: linear-gradient(135deg, #fef9c3 0%, #fef08a 100%);
+      --scrollbar-thumb: #fcd34d; --scrollbar-track: #fefce8;
+    }
+    [data-theme="science"] {
+      --bg-primary: #ecfeff; --bg-secondary: #ffffff; --bg-card: #ffffff;
+      --bg-upload: #cffafe; --accent: #0891b2; --accent2: #0e7490;
+      --accent-light: #cffafe; --text-primary: #083344; --text-secondary: #4b5563;
+      --text-muted: #9ca3af; --border: #67e8f9; --border-light: #a5f3fc;
+      --shadow: 0 4px 24px rgba(8,145,178,0.10); --shadow-hover: 0 8px 32px rgba(8,145,178,0.18);
+      --gradient: linear-gradient(135deg, #0891b2 0%, #0e7490 50%, #155e75 100%);
+      --gradient-soft: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%);
+      --scrollbar-thumb: #67e8f9; --scrollbar-track: #ecfeff;
+    }
+
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      transition: background 0.5s ease, color 0.5s ease;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+    ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: var(--gradient);
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-logo .icon { font-size: 2rem; }
+    .header-title { color: #fff; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; }
+    .header-subtitle { color: rgba(255,255,255,0.85); font-size: 0.85rem; margin-top: 2px; }
+    .header-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .theme-badge {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    .btn-history {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-history:hover { background: rgba(255,255,255,0.35); }
+
+    /* ===== LAYOUT ===== */
+    .container { max-width: 1200px; margin: 0 auto; padding: 32px 20px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+    @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+    /* ===== CARD ===== */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      transition: box-shadow 0.3s ease, border-color 0.3s ease, background 0.5s ease;
+    }
+    .card:hover { box-shadow: var(--shadow-hover); }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .card-icon { font-size: 1.4rem; }
+    .card-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+    .card-subtitle { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+
+    /* ===== WELCOME BANNER ===== */
+    .welcome-banner {
+      background: var(--gradient-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      margin-bottom: 24px;
+    }
+    .welcome-banner h2 { font-size: 1.3rem; font-weight: 800; color: var(--accent); margin-bottom: 12px; }
+    .welcome-banner ul { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .welcome-banner ul li { font-size: 0.95rem; color: var(--text-secondary); }
+
+    /* ===== UPLOAD ZONE ===== */
+    .upload-zone {
+      background: var(--bg-upload);
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--accent);
+      background: var(--accent-light);
+      transform: translateY(-2px);
+    }
+    .upload-zone.has-file { border-style: solid; border-color: var(--success); background: #f0fdf4; }
+    [data-theme="tech"] .upload-zone.has-file { background: #0f2a1a; }
+    .upload-icon { font-size: 3rem; margin-bottom: 12px; }
+    .upload-text { font-size: 1rem; font-weight: 600; color: var(--accent); margin-bottom: 4px; }
+    .upload-hint { font-size: 0.82rem; color: var(--text-muted); }
+    .upload-filename {
+      margin-top: 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--success);
+      display: none;
+    }
+    .upload-zone.has-file .upload-filename { display: block; }
+    #file-input { display: none; }
+    .upload-progress {
+      margin-top: 10px;
+      height: 4px;
+      background: var(--border-light);
+      border-radius: 2px;
+      overflow: hidden;
+      display: none;
+    }
+    .upload-progress.active { display: block; }
+    .upload-progress-bar {
+      height: 100%;
+      background: var(--gradient);
+      width: 0%;
+      transition: width 0.3s ease;
+      border-radius: 2px;
+    }
+
+    /* ===== RUN ALL BUTTON ===== */
+    .run-all-wrapper { text-align: center; margin: 24px 0; }
+    .btn-run-all {
+      background: var(--gradient);
+      color: #fff;
+      border: none;
+      padding: 16px 48px;
+      border-radius: 50px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+      letter-spacing: 0.5px;
+    }
+    .btn-run-all:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); }
+    .btn-run-all:active { transform: translateY(0); }
+    .btn-run-all:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* ===== OUTPUT PANEL ===== */
+    .output-panel {
+      height: 340px;
+      overflow-y: auto;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--text-secondary);
+      position: relative;
+      transition: background 0.5s ease;
+    }
+    .output-panel::-webkit-scrollbar { width: 4px; }
+    .output-panel.loading { pointer-events: none; }
+    .output-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      font-size: 0.85rem;
+      text-align: center;
+      margin-top: 120px;
+    }
+
+    /* ===== SPINNER ===== */
+    .spinner-wrap {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.7);
+      border-radius: var(--radius-sm);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 5;
+    }
+    [data-theme="tech"] .spinner-wrap { background: rgba(15,23,42,0.75); }
+    .spinner-wrap.active { display: flex; }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border-light);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    .spinner-label { font-size: 0.8rem; color: var(--text-muted); }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== ERROR PANEL ===== */
+    .error-msg {
+      display: none;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #b91c1c;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      margin-top: 8px;
+    }
+    .error-msg.active { display: block; }
+
+    /* ===== MARKDOWN STYLES ===== */
+    .md-line { display: block; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+    .md-h1 { font-size: 1.3rem; font-weight: 800; color: var(--accent); margin: 12px 0 6px; }
+    .md-h2 { font-size: 1.1rem; font-weight: 700; color: var(--accent); margin: 10px 0 4px; }
+    .md-h3 { font-size: 1rem; font-weight: 700; color: var(--accent2); margin: 8px 0 4px; }
+    .md-hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+    .md-ul { padding-left: 18px; }
+    .md-ul li, .md-ol li { margin: 3px 0; }
+    .md-ol { padding-left: 22px; }
+    .md-p { margin: 2px 0; }
+    strong { color: var(--text-primary); }
+    code { background: var(--accent-light); color: var(--accent); padding: 1px 5px; border-radius: 4px; font-family: monospace; font-size: 0.85em; }
+    .cursor-blink { display: inline-block; width: 2px; height: 1em; background: var(--accent); animation: blink 0.8s steps(1) infinite; margin-left: 1px; vertical-align: text-bottom; }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* ===== IMAGE PANEL ===== */
+    .image-panel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      min-height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .image-panel img { width: 100%; height: auto; border-radius: var(--radius-sm); display: block; }
+    .image-placeholder { color: var(--text-muted); font-size: 0.85rem; font-style: italic; }
+
+    /* ===== CHAT WIDGET ===== */
+    .chat-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      height: 520px;
+    }
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .chat-bubble {
+      max-width: 85%;
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 0.88rem;
+      line-height: 1.65;
+      animation: fadeIn 0.25s ease;
+    }
+    .chat-bubble.user {
+      background: var(--gradient);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .chat-bubble.assistant {
+      background: var(--bg-primary);
+      color: var(--text-secondary);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      border: 1px solid var(--border-light);
+    }
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid var(--border-light);
+    }
+    .chat-input {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      font-size: 0.9rem;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .chat-input:focus { border-color: var(--accent); }
+    .btn-send {
+      background: var(--gradient);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      font-size: 0.88rem;
+    }
+    .btn-send:hover { opacity: 0.9; }
+    .btn-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* ===== SECTION HEADERS ===== */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 32px 0 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--border-light);
+    }
+    .section-header .line { flex: 1; height: 1px; background: var(--border-light); }
+    .section-header .label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      padding: 4px 12px;
+      background: var(--accent-light);
+      border-radius: 20px;
+      color: var(--accent);
+    }
+
+    /* ===== HISTORY MODAL ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 28px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-title { font-size: 1.2rem; font-weight: 800; color: var(--accent); }
+    .modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted); line-height: 1; }
+    .history-item {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .history-item:hover { border-color: var(--accent); box-shadow: var(--shadow); }
+    .history-item-title { font-weight: 700; font-size: 0.9rem; color: var(--text-primary); }
+    .history-item-meta { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+    .history-empty { text-align: center; color: var(--text-muted); font-size: 0.88rem; padding: 30px; }
+    .btn-clear-history {
+      background: #fef2f2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      margin-top: 12px;
+      transition: background 0.2s;
+    }
+    .btn-clear-history:hover { background: #fee2e2; }
+
+    /* ===== QUIZ INSTRUCTIONS ===== */
+    .quiz-instructions {
+      background: var(--gradient-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .quiz-instructions p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ===== CONFIDENCE BADGES ===== */
+    .tag-easy { color: #16a34a; background: #dcfce7; padding: 1px 6px; border-radius: 4px; font-weight: 700; font-size: 0.82em; }
+    .tag-medium { color: #d97706; background: #fef9c3; padding: 1px 6px; border-radius: 4px; font-weight: 700; font-size: 0.82em; }
+    .tag-hard { color: #dc2626; background: #fee2e2; padding: 1px 6px; border-radius: 4px; font-weight: 700; font-size: 0.82em; }
+
+    /* ===== FOOTER ===== */
+    .footer {
+      text-align: center;
+      padding: 32px 20px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border-light);
+      margin-top: 40px;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--text-primary);
+      color: var(--bg-card);
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      z-index: 9999;
+      animation: slideUp 0.3s ease;
+      display: none;
+    }
+    .toast.show { display: block; }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <div class="header-logo">
+    <span class="icon">📚</span>
+    <div>
+      <div class="header-title">StudySnap</div>
+      <div class="header-subtitle">AI-Powered Study Assistant</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <span class="theme-badge" id="theme-badge">✨ Default Theme</span>
+    <button class="btn-history" onclick="openHistory()">📂 History</button>
+  </div>
+</header>
+
+<!-- ===== MAIN CONTAINER ===== -->
+<div class="container">
+
+  <!-- SECTION: UPLOAD -->
+  <div class="section-header">
+    <div class="line"></div>
+    <span class="label">Step 1 — Upload Your Notes</span>
+    <div class="line"></div>
+  </div>
+
+  <!-- Widget 1: Welcome Banner -->
+  <div class="welcome-banner">
+    <h2>📚 Welcome to your Study Assistant!</h2>
+    <p style="color:var(--text-secondary);font-size:0.95rem;margin-bottom:10px;">Upload your PDF lecture notes below and instantly get:</p>
+    <ul>
+      <li>✅ A clear 5–7 bullet point summary</li>
+      <li>🃏 5 flashcards in Q&A format</li>
+      <li>🏷️ Key terms glossary with real-world examples</li>
+      <li>🎯 Difficulty level tags per concept</li>
+      <li>📝 5 multiple-choice quiz questions</li>
+      <li>🖼️ A cute visual topic illustration</li>
+    </ul>
+  </div>
+
+  <!-- Widget 2: File Upload -->
+  <div class="card" style="margin-bottom:24px;">
+    <div class="card-header">
+      <span class="card-icon">📄</span>
+      <div>
+        <div class="card-title">Lecture Notes</div>
+        <div class="card-subtitle">Upload your PDF lecture notes here</div>
+      </div>
+    </div>
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()"
+         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+      <div class="upload-icon">📁</div>
+      <div class="upload-text">Click to upload or drag & drop</div>
+      <div class="upload-hint">PDF files only · Max 10MB</div>
+      <div class="upload-filename" id="upload-filename">✅ No file selected</div>
+      <div class="upload-progress" id="upload-progress">
+        <div class="upload-progress-bar" id="upload-progress-bar"></div>
+      </div>
+    </div>
+    <input type="file" id="file-input" accept=".pdf,application/pdf" onchange="handleFileSelect(event)" />
+  </div>
+
+  <!-- Run All Button -->
+  <div class="run-all-wrapper">
+    <button class="btn-run-all" id="btn-run-all" onclick="runAll()">
+      🚀 Generate All Study Materials
+    </button>
+  </div>
+
+  <!-- SECTION: OVERVIEW -->
+  <div class="section-header">
+    <div class="line"></div>
+    <span class="label">Step 2 — Study Overview</span>
+    <div class="line"></div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Widget 3: Estimated Study Time -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">⏱️</span>
+        <div>
+          <div class="card-title">Estimated Study Time</div>
+          <div class="card-subtitle">Time breakdown for this topic</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div class="output-panel" id="out-study-time">
+          <div class="output-empty">Upload your notes and click Generate ↑</div>
+        </div>
+        <div class="spinner-wrap" id="spin-study-time"><div class="spinner"></div><span class="spinner-label">Estimating time…</span></div>
+      </div>
+      <div class="error-msg" id="err-study-time"></div>
+    </div>
+
+    <!-- Widget 4: Bullet Point Summary -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">📋</span>
+        <div>
+          <div class="card-title">Bullet Point Summary</div>
+          <div class="card-subtitle">5–7 key takeaways</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div class="output-panel" id="out-summary">
+          <div class="output-empty">Upload your notes and click Generate ↑</div>
+        </div>
+        <div class="spinner-wrap" id="spin-summary"><div class="spinner"></div><span class="spinner-label">Summarising…</span></div>
+      </div>
+      <div class="error-msg" id="err-summary"></div>
+    </div>
+  </div>
+
+  <!-- SECTION: DEEP DIVE -->
+  <div class="section-header">
+    <div class="line"></div>
+    <span class="label">Step 3 — Deep Dive</span>
+    <div class="line"></div>
+  </div>
+
+  <div class="grid-3">
+    <!-- Widget 5: Key Terms Glossary -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">📌</span>
+        <div>
+          <div class="card-title">Key Terms Glossary</div>
+          <div class="card-subtitle">Definitions & examples</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div class="output-panel" id="out-key-terms">
+          <div class="output-empty">Waiting for notes…</div>
+        </div>
+        <div class="spinner-wrap" id="spin-key-terms"><div class="spinner"></div><span class="spinner-label">Building glossary…</span></div>
+      </div>
+      <div class="error-msg" id="err-key-terms"></div>
+    </div>
+
+    <!-- Widget 6: Real World Examples -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">💡</span>
+        <div>
+          <div class="card-title">Real World Examples</div>
+          <div class="card-subtitle">Abstract → practical</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div class="output-panel" id="out-examples">
+          <div class="output-empty">Waiting for notes…</div>
+        </div>
+        <div class="spinner-wrap" id="spin-examples"><div class="spinner"></div><span class="spinner-label">Finding examples…</span></div>
+      </div>
+      <div class="error-msg" id="err-examples"></div>
+    </div>
+
+    <!-- Widget 7: Difficulty Level -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">🎚️</span>
+        <div>
+          <div class="card-title">Difficulty Level Tags</div>
+          <div class="card-subtitle">Easy / Medium / Hard</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div class="output-panel" id="out-difficulty">
+          <div class="output-empty">Waiting for notes…</div>
+        </div>
+        <div class="spinner-wrap" id="spin-difficulty"><div class="spinner"></div><span class="spinner-label">Tagging difficulty…</span></div>
+      </div>
+      <div class="error-msg" id="err-difficulty"></div>
+    </div>
+  </div>
+
+  <!-- SECTION: FLASHCARDS + VISUAL -->
+  <div class="section-header">
+    <div class="line"></div>
+    <span class="label">Step 4 — Flashcards &amp; Visual</span>
+    <div class="line"></div>
+  </div>
+
+  <div class="grid-2">
+    <!-- Widget 8: Flashcards -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">🃏</span>
+        <div>
+          <div class="card-title">Flashcards</div>
+          <div class="card-subtitle">5 Q&amp;A cards to review</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div class="output-panel" id="out-flashcards">
+          <div class="output-empty">Waiting for notes…</div>
+        </div>
+        <div class="spinner-wrap" id="spin-flashcards"><div class="spinner"></div><span class="spinner-label">Creating flashcards…</span></div>
+      </div>
+      <div class="error-msg" id="err-flashcards"></div>
+    </div>
+
+    <!-- Widget 11: Topic Visual -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-icon">🖼️</span>
+        <div>
+          <div class="card-title">Topic Visual</div>
+          <div class="card-subtitle">Kawaii illustration of your topic</div>
+        </div>
+      </div>
+      <div style="position:relative;">
+        <div class="image-panel" id="out-visual">
+          <span class="image-placeholder">Visual will appear here after generation</span>
+        </div>
+        <div class="spinner-wrap" id="spin-visual"><div class="spinner"></div><span class="spinner-label">Painting illustration…</span></div>
+      </div>
+      <div class="error-msg" id="err-visual"></div>
+    </div>
+  </div>
+
+  <!-- SECTION: QUIZ -->
+  <div class="section-header">
+    <div class="line"></div>
+    <span class="label">Step 5 — Interactive Quiz</span>
+    <div class="line"></div>
+  </div>
+
+  <!-- Widget 9: Quiz Instructions -->
+  <div class="quiz-instructions">
+    <p>🎯 <strong>Ready to test yourself?</strong><br>
+    Type <strong>start</strong> in the chat below to begin the quiz. The AI will present one question at a time — answer with <strong>A, B, C, or D</strong> and it will reveal if you're correct!</p>
+  </div>
+
+  <!-- Widget 10: Interactive Quiz Chatbot -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-icon">🤖</span>
+      <div>
+        <div class="card-title">Interactive Quiz</div>
+        <div class="card-subtitle">Chat with your AI quiz master</div>
+      </div>
+    </div>
+    <div class="chat-container" id="chat-container">
+      <div class="chat-messages" id="chat-messages">
+        <div class="chat-bubble assistant" id="chat-welcome">
+          👋 Welcome to the Quiz! I'll test your understanding of the lecture notes.<br><br>
+          When you're ready, type <strong>start</strong> and I'll present the first question. Answer with A, B, C, or D — I'll tell you if you're right and keep track of your score!<br><br>
+          Good luck! 🍀
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" class="chat-input" id="chat-input" placeholder="Type start to begin…" onkeydown="if(event.key==='Enter')sendChat()" />
+        <button class="btn-send" id="btn-send" onclick="sendChat()">Send ➤</button>
+      </div>
+    </div>
+    <div class="error-msg" id="err-quiz"></div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ===== HISTORY MODAL ===== -->
+<div class="modal-overlay" id="history-modal" onclick="if(event.target===this)closeHistory()">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">📂 Session History</span>
+      <button class="modal-close" onclick="closeHistory()">×</button>
+    </div>
+    <div id="history-list"></div>
+    <button class="btn-clear-history" onclick="clearHistory()">🗑️ Clear All History</button>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== FOOTER ===== -->
+<footer class="footer">
+  <p>StudySnap · Powered by Amazon Bedrock (Claude Haiku 4.5 &amp; Nova Canvas) · Built on AWS Lambda + S3</p>
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+// ── URL PLACEHOLDERS (replaced by GitHub Actions) ────────────────────────────
+const STREAM_URLS = {
+  estimated_study_time: '__URL_ESTIMATED_STUDY_TIME__',
+  bullet_point_summary: '__URL_BULLET_POINT_SUMMARY__',
+  key_terms_glossary:   '__URL_KEY_TERMS_GLOSSARY__',
+  real_world_examples:  '__URL_REAL_WORLD_EXAMPLES__',
+  difficulty_level_tag: '__URL_DIFFICULTY_LEVEL_TAG__',
+  flashcards:           '__URL_FLASHCARDS__',
+  interactive_quiz:     '__URL_INTERACTIVE_QUIZ__',
+};
+const DIAGRAM_API = '__DIAGRAM_API_URL__';
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let uploadedFileData = null;   // raw base64 string (no prefix)
+let uploadedFileMime = null;   // e.g. "application/pdf"
+let uploadedFileName = null;
+let chatHistory = [];
+let lectureNotesText = '';     // extracted text hint passed to all prompts
+let isStreaming = false;
+
+// ── THEME KEYWORDS MAP ───────────────────────────────────────────────────────
+const THEME_MAP = [
+  { keywords: ['programming','computer','code','software','algorithm','database','network','cyber','machine learning','AI','javascript','python','java','html','css'], theme: 'tech',    label: '💻 Tech Theme' },
+  { keywords: ['biology','ecology','evolution','plant','animal','environment','climate','photosynthesis','DNA','gene','species','ecosystem'], theme: 'nature',  label: '🌿 Nature Theme' },
+  { keywords: ['art','design','colour','color','painting','sculpture','architecture','music','film','aesthetic','creative','visual'], theme: 'art',     label: '🎨 Art Theme' },
+  { keywords: ['history','war','empire','revolution','ancient','medieval','century','dynasty','civilization','colonial','independence'], theme: 'history', label: '🏛️ History Theme' },
+  { keywords: ['chemistry','physics','mathematics','calculus','thermodynamics','quantum','relativity','molecule','atom','reaction','equation','statistics'], theme: 'science', label: '🔬 Science Theme' },
+];
+
+function detectAndApplyTheme(text) {
+  const lower = text.toLowerCase();
+  let bestTheme = null, bestLabel = '✨ Default Theme', bestCount = 0;
+  for (const entry of THEME_MAP) {
+    const count = entry.keywords.filter(k => lower.includes(k)).length;
+    if (count > bestCount) { bestCount = count; bestTheme = entry.theme; bestLabel = entry.label; }
+  }
+  if (bestTheme) {
+    document.body.setAttribute('data-theme', bestTheme);
+    document.getElementById('theme-badge').textContent = bestLabel;
+    showToast(`Theme switched to ${bestLabel}`);
+  } else {
+    document.body.removeAttribute('data-theme');
+    document.getElementById('theme-badge').textContent = '✨ Default Theme';
+  }
+}
+
+// ── FILE UPLOAD ──────────────────────────────────────────────────────────────
+function handleDragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag-over'); }
+function handleDragLeave(e) { document.getElementById('upload-zone').classList.remove('drag-over'); }
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('upload-zone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+}
+function handleFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) processFile(file);
+}
+function processFile(file) {
+  if (file.type !== 'application/pdf' && !file.name.endsWith('.pdf')) {
+    showToast('⚠️ Please upload a PDF file only.');
+    return;
+  }
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('⚠️ File too large. Max 10MB.');
+    return;
+  }
+  uploadedFileName = file.name;
+  const progress = document.getElementById('upload-progress');
+  const bar = document.getElementById('upload-progress-bar');
+  progress.classList.add('active');
+  bar.style.width = '0%';
+
+  const reader = new FileReader();
+  reader.onprogress = (e) => { if (e.lengthComputable) bar.style.width = (e.loaded / e.total * 100) + '%'; };
+  reader.onload = (e) => {
+    bar.style.width = '100%';
+    setTimeout(() => { progress.classList.remove('active'); bar.style.width = '0%'; }, 600);
+    const dataUrl = e.target.result;
+    const commaIdx = dataUrl.indexOf(',');
+    uploadedFileData = dataUrl.substring(commaIdx + 1);
+    uploadedFileMime = file.type || 'application/pdf';
+    lectureNotesText = `[PDF: ${file.name}]`;
+
+    const zone = document.getElementById('upload-zone');
+    zone.classList.add('has-file');
+    const fn = document.getElementById('upload-filename');
+    fn.textContent = `✅ ${file.name}`;
+
+    detectAndApplyTheme(file.name);
+    showToast(`📄 ${file.name} loaded — click Generate!`);
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── MARKDOWN RENDERER ────────────────────────────────────────────────────────
+function renderMarkdown(text) {
+  const lines = text.split('\n');
+  const frag = document.createDocumentFragment();
+  let ulEl = null, olEl = null;
+
+  function flushList() { ulEl = null; olEl = null; }
+
+  lines.forEach(raw => {
+    const line = raw;
+    if (/^---+$/.test(line.trim())) {
+      flushList();
+      const hr = document.createElement('hr'); hr.className = 'md-hr';
+      frag.appendChild(hr); return;
+    }
+    if (/^# /.test(line)) {
+      flushList();
+      const el = document.createElement('div'); el.className = 'md-line md-h1';
+      el.innerHTML = inlineFormat(line.replace(/^# /, '')); frag.appendChild(el); return;
+    }
+    if (/^## /.test(line)) {
+      flushList();
+      const el = document.createElement('div'); el.className = 'md-line md-h2';
+      el.innerHTML = inlineFormat(line.replace(/^## /, '')); frag.appendChild(el); return;
+    }
+    if (/^### /.test(line)) {
+      flushList();
+      const el = document.createElement('div'); el.className = 'md-line md-h3';
+      el.innerHTML = inlineFormat(line.replace(/^### /, '')); frag.appendChild(el); return;
+    }
+    if (/^[-*] /.test(line)) {
+      if (!ulEl) { ulEl = document.createElement('ul'); ulEl.className = 'md-ul md-line'; olEl = null; frag.appendChild(ulEl); }
+      const li = document.createElement('li'); li.innerHTML = inlineFormat(line.replace(/^[-*] /, '')); ulEl.appendChild(li); return;
+    }
+    if (/^\d+\. /.test(line)) {
+      if (!olEl) { olEl = document.createElement('ol'); olEl.className = 'md-ol md-line'; ulEl = null; frag.appendChild(olEl); }
+      const li = document.createElement('li'); li.innerHTML = inlineFormat(line.replace(/^\d+\. /, '')); olEl.appendChild(li); return;
+    }
+    flushList();
+    if (line.trim() === '') {
+      const br = document.createElement('br'); frag.appendChild(br); return;
+    }
+    const el = document.createElement('span'); el.className = 'md-line md-p';
+    el.innerHTML = inlineFormat(line) + '<br>'; frag.appendChild(el);
+  });
+  return frag;
+}
+
+function inlineFormat(text) {
+  return text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+    .replace(/🟢/g, '<span class="tag-easy">🟢 EASY</span>')
+    .replace(/🟡/g, '<span class="tag-medium">🟡 MEDIUM</span>')
+    .replace(/🔴/g, '<span class="tag-hard">🔴 HARD</span>');
+}
+
+// ── STREAMING FETCH ──────────────────────────────────────────────────────────
+async function streamToPanel(url, body, panelId, spinnerId, errId) {
+  const panel = document.getElementById(panelId);
+  const spinner = document.getElementById(spinnerId);
+  const errEl = document.getElementById(errId);
+
+  panel.innerHTML = '';
+  errEl.classList.remove('active');
+  spinner.classList.add('active');
+
+  // Add blinking cursor
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor-blink';
+  panel.appendChild(cursor);
+
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}: ${resp.statusText}`);
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let fullText = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      fullText += decoder.decode(value, { stream: !done });
+      // Flush complete lines
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // keep incomplete line
+      for (const line of lines) {
+        if (line === '') continue;
+        panel.removeChild(cursor);
+        const frag = renderMarkdown(line);
+        panel.appendChild(frag);
+        panel.appendChild(cursor);
+        panel.scrollTop = panel.scrollHeight;
+      }
+    }
+    // Flush remainder
+    if (buffer.trim()) {
+      panel.removeChild(cursor);
+      const frag = renderMarkdown(buffer);
+      panel.appendChild(frag);
+    } else {
+      panel.removeChild(cursor);
+    }
+    panel.scrollTop = panel.scrollHeight;
+    return fullText;
+  } catch (err) {
+    panel.removeChild(cursor);
+    errEl.textContent = `❌ Error: ${err.message}`;
+    errEl.classList.add('active');
+    return '';
+  } finally {
+    spinner.classList.remove('active');
+  }
+}
+
+// ── BUILD REQUEST BODY ───────────────────────────────────────────────────────
+function buildBody(extraFields = {}) {
+  const body = { ...extraFields };
+  if (uploadedFileData) {
+    body.file_data = uploadedFileData;
+    body.file_mime = uploadedFileMime;
+  }
+  return body;
+}
+
+// ── RUN ALL ──────────────────────────────────────────────────────────────────
+async function runAll() {
+  if (!uploadedFileData) {
+    showToast('⚠️ Please upload a PDF first!');
+    return;
+  }
+  const btn = document.getElementById('btn-run-all');
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating…';
+
+  const body = buildBody();
+
+  const tasks = [
+    streamToPanel(STREAM_URLS.estimated_study_time, body, 'out-study-time', 'spin-study-time', 'err-study-time'),
+    streamToPanel(STREAM_URLS.bullet_point_summary,  body, 'out-summary',    'spin-summary',    'err-summary'),
+    streamToPanel(STREAM_URLS.key_terms_glossary,    body, 'out-key-terms',  'spin-key-terms',  'err-key-terms'),
+    streamToPanel(STREAM_URLS.real_world_examples,   body, 'out-examples',   'spin-examples',   'err-examples'),
+    streamToPanel(STREAM_URLS.difficulty_level_tag,  body, 'out-difficulty', 'spin-difficulty', 'err-difficulty'),
+    streamToPanel(STREAM_URLS.flashcards,             body, 'out-flashcards', 'spin-flashcards', 'err-flashcards'),
+    generateImage(body),
+  ];
+
+  const results = await Promise.allSettled(tasks);
+
+  // Detect theme from summary text
+  const summaryText = results[1].status === 'fulfilled' ? results[1].value : '';
+  if (summaryText) detectAndApplyTheme(summaryText);
+
+  saveToHistory();
+  btn.disabled = false;
+  btn.textContent = '🚀 Generate All Study Materials';
+  showToast('✅ All study materials generated!');
+}
+
+// ── IMAGE GENERATION ─────────────────────────────────────────────────────────
+async function generateImage(body) {
+  const panel = document.getElementById('out-visual');
+  const spinner = document.getElementById('spin-visual');
+  const errEl = document.getElementById('err-visual');
+
+  panel.innerHTML = '<span class="image-placeholder">Generating illustration…</span>';
+  errEl.classList.remove('active');
+  spinner.classList.add('active');
+
+  try {
+    const resp = await fetch(`${DIAGRAM_API}/visual`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    if (data.image_base64) {
+      const img = document.createElement('img');
+      img.src = `data:image/png;base64,${data.image_base64}`;
+      img.alt = 'Topic visual illustration';
+      panel.innerHTML = '';
+      panel.appendChild(img);
+    } else {
+      throw new Error('No image returned');
+    }
+  } catch (err) {
+    panel.innerHTML = '<span class="image-placeholder">Image unavailable</span>';
+    errEl.textContent = `❌ Image error: ${err.message}`;
+    errEl.classList.add('active');
+  } finally {
+    spinner.classList.remove('active');
+  }
+}
+
+// ── CHAT ─────────────────────────────────────────────────────────────────────
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const message = input.value.trim();
+  if (!message) return;
+  if (isStreaming) return;
+
+  input.value = '';
+  appendChatBubble('user', message);
+  chatHistory.push({ role: 'user', content: message });
+
+  const btnSend = document.getElementById('btn-send');
+  btnSend.disabled = true;
+  isStreaming = true;
+
+  const assistantBubble = appendChatBubble('assistant', '');
+  const cursor = document.createElement('span');
+  cursor.className = 'cursor-blink';
+  assistantBubble.appendChild(cursor);
+
+  const errEl = document.getElementById('err-quiz');
+  errEl.classList.remove('active');
+
+  try {
+    const resp = await fetch(STREAM_URLS.interactive_quiz, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message,
+        history: chatHistory.slice(0, -1),
+        file_data: uploadedFileData || undefined,
+        file_mime: uploadedFileMime || undefined,
+      })
+    });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let fullReply = '';
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      buffer += chunk;
+      fullReply += chunk;
+
+      // Render streaming text into bubble
+      assistantBubble.removeChild(cursor);
+      assistantBubble.innerHTML = '';
+      const frag = renderMarkdown(fullReply);
+      assistantBubble.appendChild(frag);
+      assistantBubble.appendChild(cursor);
+      assistantBubble.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    assistantBubble.removeChild(cursor);
+    assistantBubble.innerHTML = '';
+    assistantBubble.appendChild(renderMarkdown(fullReply));
+
+    chatHistory.push({ role: 'assistant', content: fullReply });
+    scrollChat();
+  } catch (err) {
+    assistantBubble.removeChild(cursor);
+    assistantBubble.textContent = '⚠️ Failed to get a response.';
+    errEl.textContent = `❌ ${err.message}`;
+    errEl.classList.add('active');
+  } finally {
+    btnSend.disabled = false;
+    isStreaming = false;
+  }
+}
+
+function appendChatBubble(role, text) {
+  const msgs = document.getElementById('chat-messages');
+  const bubble = document.createElement('div');
+  bubble.className = `chat-bubble ${role}`;
+  if (text) bubble.appendChild(renderMarkdown(text));
+  msgs.appendChild(bubble);
+  scrollChat();
+  return bubble;
+}
+
+function scrollChat() {
+  const msgs = document.getElementById('chat-messages');
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ── HISTORY ──────────────────────────────────────────────────────────────────
+function saveToHistory() {
+  const summaryEl = document.getElementById('out-summary');
+  const summaryText = summaryEl.textContent.trim().substring(0, 200);
+  if (!summaryText || !uploadedFileName) return;
+
+  const sessions = JSON.parse(localStorage.getItem('studysnap_history') || '[]');
+  const session = {
+    id: Date.now(),
+    filename: uploadedFileName,
+    summary: summaryText,
+    theme: document.body.getAttribute('data-theme') || 'default',
+    timestamp: new Date().toLocaleString(),
+  };
+  sessions.unshift(session);
+  // Keep max 20
+  if (sessions.length > 20) sessions.splice(20);
+  localStorage.setItem('studysnap_history', JSON.stringify(sessions));
+}
+
+function openHistory() {
+  const sessions = JSON.parse(localStorage.getItem('studysnap_history') || '[]');
+  const listEl = document.getElementById('history-list');
+  listEl.innerHTML = '';
+  if (sessions.length === 0) {
+    listEl.innerHTML = '<div class="history-empty">No saved sessions yet. Generate study materials to save a session.</div>';
+  } else {
+    sessions.forEach(s => {
+      const item = document.createElement('div');
+      item.className = 'history-item';
+      item.innerHTML = `<div class="history-item-title">📄 ${escapeHtml(s.filename)}</div>
+        <div class="history-item-meta">🕐 ${escapeHtml(s.timestamp)} · Theme: ${escapeHtml(s.theme)}</div>
+        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:6px;">${escapeHtml(s.summary)}…</div>`;
+      listEl.appendChild(item);
+    });
+  }
+  document.getElementById('history-modal').classList.add('active');
+}
+
+function closeHistory() {
+  document.getElementById('history-modal').classList.remove('active');
+}
+
+function clearHistory() {
+  localStorage.removeItem('studysnap_history');
+  document.getElementById('history-list').innerHTML = '<div class="history-empty">History cleared.</div>';
+  showToast('🗑️ History cleared');
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── TOAST ────────────────────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Restore theme if last session saved one
+  const sessions = JSON.parse(localStorage.getItem('studysnap_history') || '[]');
+  // Always start fresh/bright, no theme restore on load
+});
+</script>
+
+</body>
+</html>
